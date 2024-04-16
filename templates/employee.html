@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="/static/employee.css">
+</head>
+<body>
+ <h2>Employee Details</h2>
+    <nav class="navbar">
+        <div class="search-container">
+            <input type="text" placeholder="Search...">
+            <button type="submit">Search</button>
+        </div>
+    </nav>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Employee Name</th>
+                <th>Department</th>
+                <th>Contact Number</th>
+                <th>Date of Birth</th>
+                <th>Position</th>
+                <th>Gender</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in response %}
+            <tr>
+                <td>{{ employee.employee_id }}</td>
+                <td>{{ employee.employee_name }}</td>
+                <td>{{ employee.department }}</td>
+                <td>{{ employee.contact_details }}</td>
+                <td>{{ employee.dob }}</td>
+                <td>{{ employee.position }}</td>
+                <td>{{ employee.gender }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
+
+
+
+

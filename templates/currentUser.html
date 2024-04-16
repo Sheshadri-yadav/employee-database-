@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Data</title>
+    <link rel="stylesheet" href="/static/currentUser.css">
+</head>
+<body>
+    <div class="container">
+        <div class="user-box">
+            <h2>Employee Data</h2>
+            {% for employee in response %}
+            <p><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+            <p><strong>Name:</strong> {{ employee.employee_name }}</p>
+            <p><strong>Salary:</strong> {{ employee.salary }}</p>
+            <p><strong>Department:</strong> {{ employee.department }}</p>
+            <p><strong>Contact Details:</strong> {{ employee.contact_details }}</p>
+            <p><strong>Gender:</strong> {{ employee.gender }}</p>
+            <p><strong>Date of Birth:</strong> {{ employee.dob }}</p>
+            <p><strong>Position:</strong> {{ employee.position }}</p>
+            <button class="updateButton" data-employee-id="{{ employee.employee_id }}">Update</button>
+            <button class="deleteButton" data-employee-id="{{ employee.employee_id }}">Delete</button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // Add event listener to delete buttons
+        const deleteButtons = document.querySelectorAll('.deleteButton');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const employeeId = button.getAttribute('data-employee-id');
+                try {
+                    const token = localStorage.getItem('access_token');
+                    const response = await fetch(`/delete_employee/${employeeId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    if (response.ok) {
+                        // Show alert message
+                        alert('Employee deleted successfully!');
+                        // Optionally, reload the page or update the UI
+                        location.reload();
+                    } else {
+                        throw new Error('Failed to delete employee');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    // Handle error (e.g., display error message)
+                }
+            });
+        });
+    </script>
+</body>
+</html>

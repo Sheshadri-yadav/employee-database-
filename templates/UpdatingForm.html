@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Employee Details</title>
+    <link rel="stylesheet" href="/static/updateForm.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Update Employee Details</h2>
+        <form id="updateForm" action="/employee_details/update/{{ employee_id }}" method="put">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="salary">Salary:</label>
+                <input type="number" id="salary" name="salary" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="dept">Department:</label>
+                <input type="text" id="dept" name="dept" required>
+            </div>
+            <div class="form-group">
+                <label for="contact_number">Contact Number:</label>
+                <input type="tel" id="contact_number" name="contact_number" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+            <div class="form-group">
+                <label for="position">Position:</label>
+                <input type="text" id="position" name="position" required>
+            </div>
+            <div class="form-group">
+                <label for="user_name">Username:</label>
+                <input type="text" id="user_name" name="user_name" required>
+            </div>
+            <div class="form-group">
+                <label for="user_pass">Password:</label>
+                <input type="password" id="user_pass" name="user_pass" required>
+            </div>
+            <button type="submit">Update</button>
+        </form>
+    </div>
+</body>
+</html>
