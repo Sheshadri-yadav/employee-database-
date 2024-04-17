@@ -55,7 +55,7 @@ async def employee_details():
 
 
 @manager.get("/employee_details/{employee_id}")
-async def CurrentEmployee(employee_id: str, request: Request):
+async def CurrentEmployee(employee_id: str):
     try:
         response = display_currentUser(employee_id)
         return response
@@ -105,4 +105,6 @@ async def SearchEmployee(request: Request):
     user_name = data.get("name")
     user=search_user(user_name)
     return user
+
+
 
