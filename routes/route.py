@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Form, Request, HTTPException, Body, Depends, Header
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, Request, HTTPException,Depends
 from starlette.templating import Jinja2Templates
 from fastapi.security import OAuth2PasswordRequestForm
 from functions import Oauth
-from functions.functions import check_login, show_all_employees, display_currentUser, insert_employee_details, \
-    delete_employee, update_employee, search_user
+from functions.functions import check_login, display_currentUser, insert_employee_details, \
+    delete_employee, update_employee, search_user, show_all_employees
 from models.model import UserCredentials, EmployeeDetails
 
 manager = APIRouter()
@@ -27,11 +26,16 @@ async def UserLogin(user_credentials: OAuth2PasswordRequestForm = Depends()):
             # Create access token
             access_token = Oauth.create_access_token(data={"user_position": user_position})
             print(access_token)
-            return RedirectResponse(url="/admin", status_code=307)
+            return {
+                "user_position":"admin",
+               "jwt token":  access_token
+            }
 
         elif user_position == "employee":
-            return RedirectResponse(url="/employee", status_code=307)
-
+            return {
+                "user_position":"employee",
+            }
+            #return RedirectResponse(url="/employee", status_code=307)
     else:
         raise HTTPException(status_code=500, detail="Invalid flag value")
 
@@ -39,7 +43,12 @@ async def UserLogin(user_credentials: OAuth2PasswordRequestForm = Depends()):
 async def employee_details():
     try:
         all_employees = show_all_employees()
-        return all_employees
+        if all_employees:
+            return all_employees
+        else:
+            return {
+                "No records found"
+            }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -49,40 +58,39 @@ async def employee_details():
 async def CurrentEmployee(employee_id: str, request: Request):
     try:
         response = display_currentUser(employee_id)
-        return templates.TemplateResponse(
-            "currentUser.html", {"request": request, "response": response}
-        )
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @manager.post("/add_employee")
-async def addEmployee(details: EmployeeDetails):
+async def addEmployee(details: EmployeeDetails, user_position:str=Depends(Oauth.current_user)):
     try:
         insert_employee_details(details)
-        return {"success": True}
+        return {"The data have been successfully added into the database": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @manager.put("/employee_details/update/{employee_id}")
-async def UpdateDetails(employee_id: str, details: EmployeeDetails):
+async def UpdateDetails(employee_id: str, details: EmployeeDetails, user_position:str=Depends(Oauth.current_user)):
     try:
         update_employee(employee_id, details.name, details.salary, details.dept, details.contact_number,
                         details.gender, details.dob, details.position)
-        return {"success": True}
+        return {"the data was successfully updated"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @manager.delete("/delete_employee/{employee_id}")
 async def DeleteData(
-    employee_id: str
+    employee_id: str,
+    user_position:str=Depends(Oauth.current_user)
 ):
     try:
         # Delete employee if user is authorized
         delete_employee(employee_id)
-        return {"success": True}
+        return {"the employee details have been successfully deleted": True}
     except Exception as e:
         # Handle unexpected errors
         raise HTTPException(status_code=500, detail=str(e))
@@ -97,3 +105,4 @@ async def SearchEmployee(request: Request):
     user_name = data.get("name")
     user=search_user(user_name)
     return user
+

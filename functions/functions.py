@@ -22,6 +22,13 @@ class EmployeeUpdateError(Exception):
 def insert_employee_details(employee_details):
     try:
         with Session() as session:
+
+            existing_employee = session.query(EmployeeTable).filter(
+                EmployeeTable.employee_id == employee_details.id).first()
+            if existing_employee:
+
+                raise DatabaseError("Employee with the same ID already exists.")
+
             employee = EmployeeTable(
                 employee_id=employee_details.id,
                 employee_name=employee_details.name,
@@ -34,12 +41,6 @@ def insert_employee_details(employee_details):
                 user_name=employee_details.user_name,
                 user_pass=employee_details.user_pass
             )
-            login = LoginTable(
-                user_name=employee_details.user_name,
-                user_pass=employee_details.user_pass,
-                user_designation=employee_details.position
-            )
-            session.add(login)
             session.add(employee)
             session.commit()
             return "Employee data successfully inserted."
@@ -50,11 +51,11 @@ def insert_employee_details(employee_details):
 def check_login(login_details):
     try:
         with Session() as session:
-            user = session.query(LoginTable).filter(LoginTable.user_name == login_details.user_name,
-                                                    LoginTable.user_pass == login_details.user_pass).first()
+            user = session.query(EmployeeTable).filter(EmployeeTable.user_name == login_details.user_name,
+                                                    EmployeeTable.user_pass == login_details.user_pass).first()
             if not user:
-                raise AuthenticationError("Login Unsuccessful")
-            user_position = user.user_designation if user else None
+                return False,AuthenticationError("Login Unsuccessful"),None
+            user_position = user.employee_position if user else None
             if user_position not in ["admin"]:
                 user_position = "employee"
             return True, "Login successful, redirecting to another page", user_position
@@ -66,6 +67,7 @@ def delete_employee(employee_id):
     try:
         with Session() as session:
             employee = session.query(EmployeeTable).filter(EmployeeTable.employee_id == employee_id).first()
+
             if not employee:
                 raise EmployeeNotFoundError(f"No employee found with ID {employee_id}.")
             session.delete(employee)
@@ -140,3 +142,29 @@ def search_user(name):
             ]
     except Exception as e:
         raise DatabaseError("Error occurred while searching for employees: " + str(e))
+
+
+
+def show_all_employees():
+    try:
+        with Session() as session:
+            list1 = []
+            all_users = session.query(EmployeeTable).all()
+            for result in all_users:
+                employee_info = {
+                    "employee_id": result.employee_id,
+                    "employee_name": result.employee_name,
+                    "salary": result.salary,
+                    "department": result.department,
+                    "contact_details": result.contact_details,
+                    "gender": result.gender,
+                    "dob": result.employee_dob,
+                    "position": result.employee_position,
+                    "user_name": result.user_name,
+                    "user_pass": result.user_pass
+                }
+                list1.append(employee_info)
+            return list1
+    except Exception as e:
+        raise DatabaseError("Error occurred while fetching all employees: " + str(e))
+
